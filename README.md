@@ -1,6 +1,6 @@
-# App Deploy Task
+# App Upgrade Task
 
-- **This task is intended to work for Kohana Version 3.3.x** 
+- **This task is intended to work with Kohana Version 3.3.x** 
 
 ## Description
-A simple application deploy task for managing application updates.
+A simple task for handling application upgrades
