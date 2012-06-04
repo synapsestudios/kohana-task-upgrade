@@ -48,7 +48,7 @@ class Task_Upgrade_Run extends Minion_Task
 		// Make sure the migrations are up-to-date
 		Minion_Task::factory(array('task' => 'migrations:run'))->execute();
 
-		if ($install_file = Kohana::find_file('upgrades', 'Install'))
+		if ($install_file = Kohana::find_file('upgrades', 'install'))
 		{
 			include $install_file;
 
