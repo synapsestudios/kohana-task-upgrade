@@ -76,7 +76,7 @@ class Minion_Task_Upgrade_Run extends Minion_Task
 		// If an upgrade isn't needed just run the migrations
 		if ($database_version == Kohana::APP_VERSION)
 		{
-			Minion_Task::factory(array('task' => 'migrations:run'))->execute();
+			Minion_Task::factory('migrations:run')->execute(array());
 
 			Minion_CLI::write('Your database is up-to-date. Nothing to do.');
 			return;
@@ -94,7 +94,7 @@ class Minion_Task_Upgrade_Run extends Minion_Task
 				throw new Minion_Exception('The expected database version if different from the actual database version. Upgrade halted.');
 
 			// Make sure the migrations are up-to-date before running the upgrade
-			Minion_Task::factory(array('task' => 'migrations:run'))->execute();
+			Minion_Task::factory('migrations:run')->execute(array());
 
 			Minion_CLI::write('Upgrading to version '.Kohana::APP_VERSION.'...');
 			$upgrade->execute($db);
@@ -103,7 +103,7 @@ class Minion_Task_Upgrade_Run extends Minion_Task
 		else
 		{
 			// Need to run the migrations even if no upgrade was found
-			Minion_Task::factory(array('task' => 'migrations:run'))->execute();
+			Minion_Task::factory('migrations:run')->execute(array());
 
 			Minion_CLI::write('No install file found. Nothing to do.');
 		}
