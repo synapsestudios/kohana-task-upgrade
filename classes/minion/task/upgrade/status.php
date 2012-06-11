@@ -4,14 +4,14 @@
  * Displays the current status of upgrades
  *
  */
-class Task_Upgrade_Status extends Minion_Task {
+class Minion_Task_Upgrade_Status extends Minion_Task {
 
 	/**
 	 * Execute the task
 	 *
 	 * @param array Config for the task
 	 */
-	public function _execute(array $config)
+	public function execute(array $config)
 	{
 		$view = new View('task/upgrade/status');
 

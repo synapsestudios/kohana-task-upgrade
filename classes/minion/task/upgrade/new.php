@@ -6,29 +6,42 @@
  *
  * @author Matt Button <matthew@sigswitch.com>
  */
-class Task_Upgrade_New extends Minion_Task
+class Minion_Task_Upgrade_New extends Minion_Task
 {
 	/**
 	 * A set of config options that this task accepts
 	 * @var array
 	 */
-	protected $_options = array(
-		'location' => APPPATH,
-		'version'  => '',
+	protected $_config = array(
+		'location',
+		'version'
 	);
-
-	protected $_errors_file = 'validation/upgrade';
 
 	/**
 	 * Execute the task
 	 *
 	 * @param array Configuration
 	 */
-	protected function _execute(array $params)
+	public function execute(array $config)
 	{
+		if ( ! self::valid_version($config['version']))
+		{
+			return 'Please provide version. E.g. --version=1.0.0'.PHP_EOL;
+		}
+
+		if ( ! self::version_exists($config['version']))
+		{
+			return 'The version you specified already exists.'.PHP_EOL;
+		}
+
+		if (empty($config['location']))
+		{
+			$config['location'] = APPPATH;
+		}
+
 		try
 		{
-			$file = $this->_generate($params);
+			$file = $this->_generate($config);
 			Minion_CLI::write('Upgrade generated: '.$file);
 		}
 		catch(ErrorException $e)

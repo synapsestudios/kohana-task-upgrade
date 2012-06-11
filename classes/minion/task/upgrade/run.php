@@ -3,12 +3,12 @@
 /**
  * Deploys a new app version
  */
-class Task_Upgrade_Run extends Minion_Task
+class Minion_Task_Upgrade_Run extends Minion_Task
 {
 
-	protected $_options = array(
-		'database'    => NULL,
-		'drop-tables' => FALSE,
+	protected $_config = array(
+		'database',
+		'drop-tables'
 	);
 	/**
 	 * Run the application migrations and upgrades
@@ -17,13 +17,15 @@ class Task_Upgrade_Run extends Minion_Task
 	 *
 	 * @param array Configuration to use
 	 */
-	protected function _execute(array $config)
+	public function execute(array $config)
 	{
 		Minion_CLI::write('-- App Upgrade --');
 
-		$db = Database::instance($config['database']);
+		$database = Arr::get($config, 'database');
 
-		if ($config['drop-tables'] === NULL)
+		$db = Database::instance($database);
+
+		if (array_key_exists('drop-tables', $config))
 		{
 			$this->_clean_install($db);
 		}
@@ -45,20 +47,20 @@ class Task_Upgrade_Run extends Minion_Task
 	{
 		Minion_CLI::write('Application not installed.');
 
-		// Make sure the migrations are up-to-date
-		Minion_Task::factory(array('task' => 'migrations:run'))->execute();
-
-		if ($install_file = Kohana::find_file('upgrades', 'Install'))
+		if ($install_file = Kohana::find_file('upgrades', 'install'))
 		{
 			include $install_file;
 
 			$install = new Upgrade_Install;
 
-			Minion_CLI::write_replace('Installing App...');
+			Minion_CLI::write('Installing App...');
 
 			$install->execute($db);
 
-			Minion_CLI::write_replace('Installing App... completed!', TRUE);
+			Minion_CLI::write('Installing App... completed!');
+
+			// Make sure the migrations are up-to-date
+			Minion_Task::factory('migrations:run')->execute(array());
 		}
 		else
 		{
@@ -94,9 +96,9 @@ class Task_Upgrade_Run extends Minion_Task
 			// Make sure the migrations are up-to-date before running the upgrade
 			Minion_Task::factory(array('task' => 'migrations:run'))->execute();
 
-			Minion_CLI::write_replace('Upgrading to version '.Kohana::APP_VERSION.'...');
+			Minion_CLI::write('Upgrading to version '.Kohana::APP_VERSION.'...');
 			$upgrade->execute($db);
-			Minion_CLI::write_replace('Upgrading to version '.Kohana::APP_VERSION.'... completed!', TRUE);
+			Minion_CLI::write('Upgrading to version '.Kohana::APP_VERSION.'... completed!');
 		}
 		else
 		{
@@ -115,7 +117,7 @@ class Task_Upgrade_Run extends Minion_Task
 
 		foreach ($tables as $table)
 		{
-			$db->query(NULL, 'DROP Table '.$db->quote_table($table));
+			$db->query(NULL, 'DROP Table '.$db->quote_identifier($table));
 		}
 
 		$db->query(NULL, 'SET foreign_key_checks = 1');

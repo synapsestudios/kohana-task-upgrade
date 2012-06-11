@@ -3,7 +3,7 @@
 /**
  * Model for managing migrations
  */
-class Model_Task_Upgrade extends Model_Database
+class Model_Task_Upgrade extends Model
 {
 
 	/**
