@@ -36,11 +36,13 @@ class Minion_Task_Upgrade_Run extends Minion_Task
 		if ( ! $database_version)
 		{
 			$this->_install($db);
+
+			// Get updated db version after install runs
+			$database_version = Model::factory('Task_Upgrade')
+				->database_version();
 		}
-		else
-		{
-			$this->_upgrade($db, $database_version);
-		}
+		
+		$this->_upgrade($db, $database_version);
 	}
 
 	protected function _install(Database $db)
