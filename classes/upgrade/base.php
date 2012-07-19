@@ -13,7 +13,7 @@ abstract class Upgrade_Base {
 	protected $_expected_version = NULL;
 
 	/**
-	 * Version of app that the installer script will install. If Different from codebase version upgrades will run.
+	 * Version of app that the installer script will install. If different from codebase version upgrades will run.
 	 * @var boolean
 	 */
 	protected $_install_version = FALSE;
@@ -35,7 +35,7 @@ abstract class Upgrade_Base {
 		$this->_execute();
 
 		Model::factory('Task_Upgrade')
-			->upgraded($this->_install_version ? $this->_install_version: Kohana::APP_VERSION);
+			->upgraded($this->_install_version ? $this->_install_version : Kohana::APP_VERSION);
 	}
 
 	/**
