@@ -73,7 +73,7 @@ class Minion_Task_Upgrade_Run extends Minion_Task
 	protected function _upgrade(Database $db, $database_version)
 	{
 		if (version_compare($database_version, Kohana::APP_VERSION, '>'))
-			throw new Minion_Exception('Database version newer than codebase. Upgrade halted.');
+			throw new Kohana_Exception('Database version newer than codebase. Upgrade halted.');
 
 		// If an upgrade isn't needed just run the migrations
 		if ($database_version == Kohana::APP_VERSION)
@@ -93,7 +93,7 @@ class Minion_Task_Upgrade_Run extends Minion_Task
 			$upgrade = new $update_class;
 
 			if ($upgrade->expected_version() !== $database_version)
-				throw new Minion_Exception('The expected database version if different from the actual database version. Upgrade halted.');
+				throw new Kohana_Exception('The expected database version if different from the actual database version. Upgrade halted.');
 
 			// Make sure the migrations are up-to-date before running the upgrade
 			Minion_Task::factory('migrations:run')->execute(array());
