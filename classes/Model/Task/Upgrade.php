@@ -29,7 +29,7 @@ class Model_Task_Upgrade extends Model_Database
 	{
 		return DB::select('version', 'timestamp')
 				->from($this->_table)
-				->order_by('timestamp', 'desc')
+				->order_by(DB::expr('INET_ATON(SUBSTRING_INDEX(CONCAT(version, ".0.0.0"), ".", 4))'), 'desc')
 				->execute($this->_db)
 				->as_array('version', 'timestamp');
 	}
