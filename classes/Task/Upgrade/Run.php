@@ -12,7 +12,7 @@ class Task_Upgrade_Run extends Minion_Task
 	);
 	/**
 	 * Run the application migrations and upgrades
-	 * 
+	 *
 	 * If no upgrade file is found all the migrations will run and notify the user the user that no upgrades were found.
 	 *
 	 * @param array Configuration to use
@@ -34,12 +34,12 @@ class Task_Upgrade_Run extends Minion_Task
 		if ( ! $database_version)
 		{
 			$this->_install($db);
-			
+
 			// Get updated db version after install runs
 			$database_version = Model::factory('Task_Upgrade')
 				->database_version();
 		}
-		
+
 		$this->_upgrade($db, $database_version);
 	}
 
@@ -50,7 +50,7 @@ class Task_Upgrade_Run extends Minion_Task
 		// Make sure the migrations are up-to-date
 		Minion_Task::factory(array('task' => 'migrations:run'))->execute();
 
-		if ($install_file = Kohana::find_file('upgrades', 'install'))
+		if ($install_file = Kohana::find_file('upgrades', 'Install'))
 		{
 			include $install_file;
 
