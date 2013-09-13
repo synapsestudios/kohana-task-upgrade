@@ -26,6 +26,7 @@ class Task_Upgrade_Run extends Minion_Task
 		if ($config['drop-tables'] === NULL)
 		{
 			$this->_clean_install($db);
+			Minion_CLI::write('Dropped Tables');
 		}
 
 		$database_version = Model::factory('Task_Upgrade')
@@ -46,9 +47,6 @@ class Task_Upgrade_Run extends Minion_Task
 	protected function _install(Database $db)
 	{
 		Minion_CLI::write('Application not installed.');
-
-		// Make sure the migrations are up-to-date
-		Minion_Task::factory(array('task' => 'migrations:run'))->execute();
 
 		if ($install_file = Kohana::find_file('upgrades', 'Install'))
 		{
@@ -73,11 +71,12 @@ class Task_Upgrade_Run extends Minion_Task
 		if (version_compare($database_version, Kohana::APP_VERSION, '>'))
 			throw new Minion_Exception('Database version ('.$database_version.') is newer than codebase ('.Kohana::APP_VERSION.'). Upgrade halted.');
 
-		// If an upgrade isn't needed just run the migrations
+		// Always run migrations before running the update.
+		Minion_Task::factory(array('task' => 'migrations:run'))->execute();
+
+		// No upgrade needed.
 		if ($database_version == Kohana::APP_VERSION)
 		{
-			Minion_Task::factory(array('task' => 'migrations:run'))->execute();
-
 			Minion_CLI::write('Your database is up-to-date. Nothing to do.');
 			return;
 		}
@@ -93,19 +92,13 @@ class Task_Upgrade_Run extends Minion_Task
 			if ($upgrade->expected_version() !== $database_version)
 				throw new Minion_Exception('The expected database version ('.$upgrade->expected_version().') is different from the actual database version ('.$database_version.'). Upgrade halted.');
 
-			// Make sure the migrations are up-to-date before running the upgrade
-			Minion_Task::factory(array('task' => 'migrations:run'))->execute();
-
 			Minion_CLI::write_replace('Upgrading to version '.Kohana::APP_VERSION.'...');
 			$upgrade->execute($db);
 			Minion_CLI::write_replace('Upgrading to version '.Kohana::APP_VERSION.'... completed!', TRUE);
 		}
 		else
 		{
-			// Need to run the migrations even if no upgrade was found
-			Minion_Task::factory(array('task' => 'migrations:run'))->execute();
-
-			Minion_CLI::write('No install file found. Nothing to do.');
+			Minion_CLI::write('No upgrade file found. Nothing to do.');
 		}
 	}
 
