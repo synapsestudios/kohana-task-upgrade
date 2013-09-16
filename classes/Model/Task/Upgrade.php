@@ -48,7 +48,7 @@ class Model_Task_Upgrade extends Model_Database
 
 	/**
 	 * Finds the current (last) database version
-	 * 
+	 *
 	 * @return string Current database version
 	 */
 	public function database_version()

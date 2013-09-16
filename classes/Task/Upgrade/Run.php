@@ -54,15 +54,81 @@ class Task_Upgrade_Run extends Minion_Task
 
 			$install = new Upgrade_Install;
 
-			Minion_CLI::write_replace('Installing App...');
+			Minion_CLI::write('Installing App...');
 
+			// Create the initial database structure and insert any data included in the install file.
+			Minion_CLI::write(' Creating initial database schema.');
+			$this->_init_database_structure($db);
+
+			Minion_CLI::write(' Inserting install data.');
+			$this->_init_database_data($db);
+
+			Minion_CLI::write(' Running install script.');
 			$install->execute($db);
 
-			Minion_CLI::write_replace('Installing App... completed!', TRUE);
+			Minion_CLI::write(' Installation completed.', TRUE);
 		}
 		else
 		{
 			Minion_CLI::write('No install file found. Nothing to do.');
+		}
+	}
+
+	protected function _init_database_structure($db)
+	{
+		$install_schema_file = APPPATH.'/upgrades/db_structure.sql';
+
+		if ( ! is_file($install_schema_file))
+			return;
+
+		$structure_sql = file_get_contents($install_schema_file);
+
+		// Split the sql file on new lines and insert into the database one line at a time.
+		foreach (preg_split('/;\s*\n/', $structure_sql) as $command)
+		{
+			try
+			{
+				$query = $db->query(NULL, $command);
+
+				if (is_object($query))
+				{
+					$query->execute();
+				}
+			}
+			catch (Database_Exception $e)
+			{
+				if ($e->getCode() !== 1065) // empty query
+					throw $e;
+			}
+		}
+	}
+
+	protected function _init_database_data($db)
+	{
+		$install_data_file = APPPATH.'/upgrades/db_data.sql';
+
+		if ( ! is_file($install_data_file))
+			return;
+
+		$data_sql = file_get_contents($install_data_file);
+
+		// Split the sql file on new lines and insert into the database one line at a time.
+		foreach (preg_split('/;\s*\n/', $data_sql) as $command)
+		{
+			try
+			{
+				$query = $db->query(NULL, $command);
+
+				if (is_object($query))
+				{
+					$query->execute();
+				}
+			}
+			catch (Database_Exception $e)
+			{
+				if ($e->getCode() !== 1065) // empty query
+					throw $e;
+			}
 		}
 	}
 
